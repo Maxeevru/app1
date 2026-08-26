@@ -28,24 +28,15 @@ jobs:
     - name: Fix Older Plugins Compatibility
       run: |
         PUB_CACHE_DIR="${{ env.PUB_CACHE || '$HOME/.pub-cache' }}"
-        echo "Fixing telephony manifest and build.gradle issues..."
+        echo "Removing forbidden package attribute from telephony manifest..."
         
-        # 1. Удаляем запрещенный package из манифеста телефонии
+        # Удаляем запрещенный package из манифеста телефонии
         find $PUB_CACHE_DIR -name "AndroidManifest.xml" -type f | while read -r manifest; do
           if grep -q 'package="com.shounakmulay.telephony"' "$manifest"; then
             echo "Removing forbidden package attribute from: $manifest"
             sed -i 's/package="com.shounakmulay.telephony"//g' "$manifest"
           fi
         done
-
-        # 2. Прописываем правильный namespace в build.gradle телефонии, чтобы Gradle 9 не ругался
-        TARGET_FILE=$(find $PUB_CACHE_DIR -name "build.gradle" | grep "telephony")
-        if [ -f "$TARGET_FILE" ]; then
-          echo "Injecting namespace into telephony build.gradle at $TARGET_FILE"
-          if ! grep -q "namespace" "$TARGET_FILE"; then
-            sed -i '/android {/a \    namespace "com.shounakmulay.telephony"' "$TARGET_FILE"
-          fi
-        fi
 
     - name: Build APK
       env:
