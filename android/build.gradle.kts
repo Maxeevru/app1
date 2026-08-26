@@ -19,20 +19,6 @@ subprojects {
     project.evaluationDependsOn(":app")
 }
 
-// ГЛОБАЛЬНЫЙ ФИКС: Принудительно поднимаем версии для всех старых плагинов
-subprojects {
-    afterEvaluate {
-        if (plugins.hasPlugin("com.android.application") || plugins.hasPlugin("com.android.library")) {
-            extensions.findByType<com.android.build.gradle.BaseExtension>()?.run {
-                compileSdkVersion(34)
-                defaultConfig {
-                    targetSdk = 34
-                }
-            }
-        }
-    }
-}
-
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
