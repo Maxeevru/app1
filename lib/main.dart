@@ -37,7 +37,7 @@ void backGroundMessageHandler(SmsMessage message) async {
   // Проверка ключевых слов
   bool isEmergency = false;
   List<String> emergencyKeywords = [
-    "РСЧС", "БЕСПИЛОТНАЯ", "РАКЕТНАЯ", "АВИАЦИОННАЯ",
+    "RSCHS", "БЕСПИЛОТНАЯ", "РАКЕТНАЯ", "АВИАЦИОННАЯ",
     "ОПАСНОСТЬ", "СНЕГ", "МЕТЕЛЬ", "ГОЛОЛЕД"
   ];
 
