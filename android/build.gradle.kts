@@ -19,6 +19,22 @@ subprojects {
     project.evaluationDependsOn(":app")
 }
 
+// ПРАВИЛЬНЫЙ ФИКС ВЕРСИЙ ДЛЯ GRADLE 9+:
+subprojects {
+    plugins.withId("com.android.application") {
+        configure<com.android.build.gradle.BaseExtension> {
+            compileSdkVersion(34)
+            defaultConfig { targetSdk = 34 }
+        }
+    }
+    plugins.withId("com.android.library") {
+        configure<com.android.build.gradle.BaseExtension> {
+            compileSdkVersion(34)
+            defaultConfig { targetSdk = 34 }
+        }
+    }
+}
+
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
