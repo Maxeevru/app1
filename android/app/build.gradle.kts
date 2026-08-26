@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.example.untitled"
-    compileSdk = 34 // Явно указали 34
+    compileSdk = 35 // Поменяли на 35
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -15,8 +15,8 @@ android {
 
     defaultConfig {
         applicationId = "com.example.untitled"
-        minSdk = 22    // Подняли до 22 ради окон поверх экрана
-        targetSdk = 34 // Выставили 34
+        minSdk = 22    // Оставляем 22 ради окон-оверлеев
+        targetSdk = 35 // Поменяли на 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
