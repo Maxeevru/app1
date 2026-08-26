@@ -28,13 +28,39 @@ jobs:
     - name: Fix Older Plugins Compatibility
       run: |
         PUB_CACHE_DIR="${{ env.PUB_CACHE || '$HOME/.pub-cache' }}"
-        echo "Removing forbidden package attribute from telephony manifest..."
+        echo "Forcing manifest and SDK version updates on all downloaded plugins..."
         
-        # Удаляем запрещенный package из манифеста телефонии
+        # 1. Удаляем запрещенный package из манифеста телефонии
         find $PUB_CACHE_DIR -name "AndroidManifest.xml" -type f | while read -r manifest; do
           if grep -q 'package="com.shounakmulay.telephony"' "$manifest"; then
             echo "Removing forbidden package attribute from: $manifest"
             sed -i 's/package="com.shounakmulay.telephony"//g' "$manifest"
+          fi
+        done
+
+        # 2. Принудительно переписываем compileSdkVersion / compileSdk на 35 во всех плагинах (включая audioplayers)
+        find $PUB_CACHE_DIR -name "build.gradle" -type f | while read -r file; do
+          if grep -q "compileSdkVersion" "$file"; then
+            sed -i 's/compileSdkVersion .*/compileSdkVersion 35/g' "$file"
+          fi
+          if grep -q "compileSdk " "$file"; then
+            sed -i 's/compileSdk .*/compileSdk = 35/g' "$file"
+          fi
+          if grep -q "targetSdkVersion" "$file"; then
+            sed -i 's/targetSdkVersion .*/targetSdkVersion 35/g' "$file"
+          fi
+          if grep -q "targetSdk " "$file"; then
+            sed -i 's/targetSdk .*/targetSdk = 35/g' "$file"
+          fi
+        done
+
+        # 3. То же самое делаем для файлов build.gradle.kts (Kotlin DSL)
+        find $PUB_CACHE_DIR -name "build.gradle.kts" -type f | while read -r file; do
+          if grep -q "compileSdk = " "$file"; then
+            sed -i 's/compileSdk = .*/compileSdk = 35/g' "$file"
+          fi
+          if grep -q "targetSdk = " "$file"; then
+            sed -i 's/targetSdk = .*/targetSdk = 35/g' "$file"
           fi
         done
 
