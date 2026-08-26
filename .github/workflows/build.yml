@@ -28,33 +28,13 @@ jobs:
     - name: Fix Older Plugins Compatibility
       run: |
         PUB_CACHE_DIR="${{ env.PUB_CACHE || '$HOME/.pub-cache' }}"
-        echo "Searching and fixing compatibility issues in all downloaded plugins..."
+        echo "Fixing manifest issues in telephony plugin..."
         
-        # 1. Исправляем ошибку с namespace
-        find $PUB_CACHE_DIR -name "build.gradle" -type f | while read -r file; do
-          if ! grep -q "namespace" "$file"; then
-            if grep -q "android {" "$file"; then
-              echo "Injecting missing namespace into: $file"
-              sed -i '/android {/a \    namespace "com.example.fallback_namespace"' "$file"
-            fi
-          fi
-        done
-        
-        # 2. Исправляем ошибку с package в AndroidManifest.xml (для телефонии)
+        # Хирургически удаляем запрещенный package из манифеста телефонии
         find $PUB_CACHE_DIR -name "AndroidManifest.xml" -type f | while read -r manifest; do
           if grep -q 'package="com.shounakmulay.telephony"' "$manifest"; then
             echo "Removing forbidden package attribute from: $manifest"
             sed -i 's/package="com.shounakmulay.telephony"//g' "$manifest"
-          fi
-        done
-
-        # 3. Принудительно поднимаем compileSdk до 34 для всех плагинов (для audioplayers)
-        find $PUB_CACHE_DIR -name "build.gradle" -type f | while read -r file; do
-          if grep -q "compileSdkVersion" "$file"; then
-            sed -i 's/compileSdkVersion .*/compileSdkVersion 34/g' "$file"
-          fi
-          if grep -q "compileSdk = " "$file"; then
-            sed -i 's/compileSdk = .*/compileSdk = 34/g' "$file"
           fi
         done
 
