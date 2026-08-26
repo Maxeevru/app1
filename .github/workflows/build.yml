@@ -25,16 +25,18 @@ jobs:
     - name: Install dependencies
       run: flutter pub get
 
-    - name: Fix Telephony Namespace Error
+    - name: Fix Older Plugins Compatibility
       run: |
         PUB_CACHE_DIR="${{ env.PUB_CACHE || '$HOME/.pub-cache' }}"
-        TARGET_FILE=$(find $PUB_CACHE_DIR -name "build.gradle" | grep "telephony")
-        if [ -f "$TARGET_FILE" ]; then
-          echo "Fixing telephony build.gradle at $TARGET_FILE"
-          if ! grep -q "namespace" "$TARGET_FILE"; then
-            sed -i '/android {/a \    namespace "com.shounakmulay.telephony"' "$TARGET_FILE"
+        echo "Searching and fixing namespace issues in all downloaded plugins..."
+        find $PUB_CACHE_DIR -name "build.gradle" -type f | while read -r file; do
+          if ! grep -q "namespace" "$file"; then
+            if grep -q "android {" "$file"; then
+              echo "Injecting missing namespace into: $file"
+              sed -i '/android {/a \    namespace "com.example.fallback_namespace"' "$file"
+            fi
           fi
-        fi
+        done
 
     - name: Build APK
       run: flutter build apk --release
