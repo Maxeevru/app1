@@ -22,11 +22,19 @@ jobs:
       with:
         channel: 'stable'
 
-    - name: Recreate Android folder
-      run: flutter create --platforms=android .
-
     - name: Install dependencies
       run: flutter pub get
+
+    - name: Fix Telephony Namespace Error
+      run: |
+        PUB_CACHE_DIR="${{ env.PUB_CACHE || '$HOME/.pub-cache' }}"
+        TARGET_FILE=$(find $PUB_CACHE_DIR -name "build.gradle" | grep "telephony")
+        if [ -f "$TARGET_FILE" ]; then
+          echo "Fixing telephony build.gradle at $TARGET_FILE"
+          if ! grep -q "namespace" "$TARGET_FILE"; then
+            sed -i '/android {/a \    namespace "com.shounakmulay.telephony"' "$TARGET_FILE"
+          fi
+        fi
 
     - name: Build APK
       run: flutter build apk --release
