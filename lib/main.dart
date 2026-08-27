@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:telephony/telephony.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart'; // ✅ ДОБАВЛЕНО
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 // ============================================================
 // ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
 // ============================================================
 String _lastSmsContent = "";
 final AudioPlayer _audioPlayer = AudioPlayer();
-final FlutterLocalNotificationsPlugin _notificationsPlugin = // ✅ ДОБАВЛЕНО
+final FlutterLocalNotificationsPlugin _notificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
 // ============================================================
@@ -53,7 +53,7 @@ void backGroundMessageHandler(SmsMessage message) async {
 
   if (!isEmergency) return;
 
-  // Показ оверлея
+  // Показ оверлея (visibility убран, чтобы не было конфликта)
   bool? isActive = await FlutterOverlayWindow.isActive();
   if (isActive != true) {
     _lastSmsContent = body;
@@ -62,8 +62,8 @@ void backGroundMessageHandler(SmsMessage message) async {
       overlayTitle: "Emergency Alert",
       overlayContent: body,
       flag: OverlayFlag.defaultFlag,
-      visibility: NotificationVisibility.visibilityPublic,
       positionGravity: PositionGravity.left,
+      // visibility: убрано, чтобы не было конфликта имён
     );
   }
 }
@@ -122,7 +122,7 @@ class _MyAppState extends State<MyApp> {
       );
 
       // ============================================================
-      // НОВЫЙ БЛОК ДЛЯ УВЕДОМЛЕНИЙ (вставлен сюда)
+      // НОВЫЙ БЛОК ДЛЯ УВЕДОМЛЕНИЙ
       // ============================================================
       const AndroidInitializationSettings initSettingsAndroid =
           AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -145,7 +145,6 @@ class _MyAppState extends State<MyApp> {
           .resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>()
           ?.createNotificationChannel(channel);
-      // ============================================================
 
       setState(() {
         _status = "✅ Утилита успешно запущена!\n\n"
@@ -254,9 +253,10 @@ class _MyAppState extends State<MyApp> {
 
     _lastSmsContent = testSms;
 
-    // 👇 ОТПРАВКА УВЕДОМЛЕНИЯ В ШТОРКУ (добавлено)
+    // Отправка уведомления в шторку
     await _sendSystemNotification('🚨 РСЧС Оповещение', testSms);
 
+    // Показ оверлея (visibility убран)
     bool? isActive = await FlutterOverlayWindow.isActive();
     if (isActive != true) {
       await FlutterOverlayWindow.showOverlay(
@@ -264,15 +264,13 @@ class _MyAppState extends State<MyApp> {
         overlayTitle: "Emergency Alert",
         overlayContent: testSms,
         flag: OverlayFlag.defaultFlag,
-        visibility: NotificationVisibility.visibilityPublic,
         positionGravity: PositionGravity.left,
+        // visibility: убрано
       );
     }
   }
 
-  // ============================================================
-  // НОВАЯ ФУНКЦИЯ ДЛЯ ОТПРАВКИ СИСТЕМНЫХ УВЕДОМЛЕНИЙ (добавлена)
-  // ============================================================
+  // Новая функция для отправки системных уведомлений
   Future<void> _sendSystemNotification(String title, String body) async {
     const AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
