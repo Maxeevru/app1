@@ -17,13 +17,17 @@
         android:icon="@mipmap/ic_launcher"
         tools:replace="android:label">
 
-        <!-- 🛠️ РАДИКАЛЬНОЕ ИСПРАВЛЕНИЕ: tools:node="replace" уничтожит скрытые конфликты внутри плагина -->
+        <!-- Корректный сервис для Android 15, который требует новая версия плагина 0.5.4 -->
         <service
             android:name="com.example.flutter_overlay_window.services.OverlayService"
             android:exported="false"
-            tools:node="replace" />
+            android:foregroundServiceType="specialUse"
+            tools:node="replace">
+            <property 
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" 
+                android:value="Emergency alerts display overlay over other apps" />
+        </service>
 
-        <!-- Служба приема СМС -->
         <receiver
             android:name="com.shounakmulay.telephony.sms.IncomingSmsReceiver"
             android:permission="android.permission.BROADCAST_SMS"
@@ -33,7 +37,6 @@
             </intent-filter>
         </receiver>
 
-        <!-- Компоненты для работы уведомлений -->
         <receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" android:exported="false" />
         <receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver" android:exported="false">
             <intent-filter>
