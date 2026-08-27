@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.example.untitled"
-    compileSdk = 35
+    compileSdk = 34 // 👈 Фиксируем на 34
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -17,19 +17,19 @@ android {
     defaultConfig {
         applicationId = "com.example.untitled"
         minSdk = 21
-        targetSdk = 34
+        targetSdk = 34 // 👈 Фиксируем на 34
         versionCode = 1
         versionName = "1.0"
         multiDexEnabled = true
     }
 
     buildTypes {
-    release {
-        signingConfig = signingConfigs.getByName("debug")
-        isMinifyEnabled = false
-        isShrinkResources = false
+        release {
+            signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = false
+            isShrinkResources = false
+        }
     }
-}
 }
 
 flutter {
@@ -39,4 +39,15 @@ flutter {
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.0")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+}
+
+// 👈 ДОБАВЛЯЕМ ЭТОТ БЛОК В САМЫЙ КОНЕЦ ФАЙЛА:
+// Он принудительно заставит все плагины компилироваться под SDK 34, игнорируя требования Android 15
+subprojects {
+    afterEvaluate {
+        if (project.hasProperty("android")) {
+            val androidExtension = project.extensions.getByName("android") as com.android.build.gradle.BaseExtension
+            androidExtension.compileSdkVersion(34)
+        }
+    }
 }
