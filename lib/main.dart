@@ -53,7 +53,7 @@ void backGroundMessageHandler(SmsMessage message) async {
 
   if (!isEmergency) return;
 
-  // Показ оверлея (visibility убран, чтобы не было конфликта)
+  // Показ оверлея
   bool? isActive = await FlutterOverlayWindow.isActive();
   if (isActive != true) {
     _lastSmsContent = body;
@@ -63,7 +63,6 @@ void backGroundMessageHandler(SmsMessage message) async {
       overlayContent: body,
       flag: OverlayFlag.defaultFlag,
       positionGravity: PositionGravity.left,
-      // visibility: убрано, чтобы не было конфликта имён
     );
   }
 }
@@ -100,30 +99,15 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    _initNotifications(); // 👈 Инициализация уведомлений ДО всего
     _initAppLogic();
   }
 
-  Future<void> _initAppLogic() async {
-    // Разрешение на оверлей
-    bool? overlayAllowed = await FlutterOverlayWindow.isPermissionGranted();
-    if (overlayAllowed != true) {
-      await FlutterOverlayWindow.requestPermission();
-    }
-
-    // Разрешение на СМС
-    bool? smsAllowed = await telephony.requestPhoneAndSmsPermissions;
-
-    if (smsAllowed == true) {
-      telephony.listenIncomingSms(
-        onNewMessage: (SmsMessage message) {
-          backGroundMessageHandler(message);
-        },
-        onBackgroundMessage: backGroundMessageHandler,
-      );
-
-      // ============================================================
-      // НОВЫЙ БЛОК ДЛЯ УВЕДОМЛЕНИЙ
-      // ============================================================
+  // ============================================================
+  // ОТДЕЛЬНАЯ ФУНКЦИЯ ДЛЯ ИНИЦИАЛИЗАЦИИ УВЕДОМЛЕНИЙ
+  // ============================================================
+  Future<void> _initNotifications() async {
+    try {
       const AndroidInitializationSettings initSettingsAndroid =
           AndroidInitializationSettings('@mipmap/ic_launcher');
       const DarwinInitializationSettings initSettingsIOS =
@@ -145,6 +129,28 @@ class _MyAppState extends State<MyApp> {
           .resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>()
           ?.createNotificationChannel(channel);
+    } catch (e) {
+      print("Ошибка инициализации уведомлений: $e");
+    }
+  }
+
+  Future<void> _initAppLogic() async {
+    // Разрешение на оверлей
+    bool? overlayAllowed = await FlutterOverlayWindow.isPermissionGranted();
+    if (overlayAllowed != true) {
+      await FlutterOverlayWindow.requestPermission();
+    }
+
+    // Разрешение на СМС
+    bool? smsAllowed = await telephony.requestPhoneAndSmsPermissions;
+
+    if (smsAllowed == true) {
+      telephony.listenIncomingSms(
+        onNewMessage: (SmsMessage message) {
+          backGroundMessageHandler(message);
+        },
+        onBackgroundMessage: backGroundMessageHandler,
+      );
 
       setState(() {
         _status = "✅ Утилита успешно запущена!\n\n"
@@ -256,7 +262,7 @@ class _MyAppState extends State<MyApp> {
     // Отправка уведомления в шторку
     await _sendSystemNotification('🚨 РСЧС Оповещение', testSms);
 
-    // Показ оверлея (visibility убран)
+    // Показ оверлея
     bool? isActive = await FlutterOverlayWindow.isActive();
     if (isActive != true) {
       await FlutterOverlayWindow.showOverlay(
@@ -265,7 +271,6 @@ class _MyAppState extends State<MyApp> {
         overlayContent: testSms,
         flag: OverlayFlag.defaultFlag,
         positionGravity: PositionGravity.left,
-        // visibility: убрано
       );
     }
   }
