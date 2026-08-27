@@ -64,6 +64,12 @@ jobs:
           fi
         done
 
+        # 4. 👇 НОВОЕ: добавляем namespace в build.gradle плагина telephony
+        find $PUB_CACHE_DIR -path "*/telephony-*/android/build.gradle" -type f | while read -r file; do
+          echo "Adding namespace to telephony build.gradle: $file"
+          sed -i '/android {/a \    namespace = "com.shounakmulay.telephony"' "$file"
+        done
+
     - name: Build APK
       env:
         GRADLE_OPTS: "-Dorg.gradle.project.kotlin.jvm.target.validation.mode=ignore"
