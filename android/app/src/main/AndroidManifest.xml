@@ -17,14 +17,9 @@
         android:icon="@mipmap/ic_launcher"
         tools:replace="android:label">
 
-        <service
+                <service
             android:name="com.example.flutter_overlay_window.services.OverlayService"
-            android:exported="false"
-            android:foregroundServiceType="specialUse">
-            <property 
-                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" 
-                android:value="Emergency alerts display overlay over other apps for emergency broadcast service" />
-        </service>
+            android:exported="false" />
 
         <receiver
             android:name="com.shounakmulay.telephony.sms.IncomingSmsReceiver"
