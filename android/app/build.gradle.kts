@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.example.untitled"
-    compileSdk = 35
+    compileSdk = 34
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
