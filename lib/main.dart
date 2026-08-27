@@ -136,6 +136,7 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _initAppLogic() async {
     // Разрешение на оверлей
+      await _notificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.requestNotificationsPermission();
     bool? overlayAllowed = await FlutterOverlayWindow.isPermissionGranted();
     if (overlayAllowed != true) {
       await FlutterOverlayWindow.requestPermission();
