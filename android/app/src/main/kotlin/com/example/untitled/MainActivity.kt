@@ -7,7 +7,6 @@ import com.shounakmulay.telephony.TelephonyPlugin
 class MainActivity: FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        // Инициализация телефонии, чтобы релизная сборка не падала
         TelephonyPlugin.registerWith(flutterEngine)
     }
 }
