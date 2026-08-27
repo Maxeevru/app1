@@ -1,46 +1,52 @@
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
+import java.util.Properties
 
-val newBuildDir: Directory =
-    rootProject.layout.buildDirectory
-        .dir("../../build")
-        .get()
-rootProject.layout.buildDirectory.value(newBuildDir)
-
-subprojects {
-    val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
-    project.layout.buildDirectory.value(newSubprojectBuildDir)
-}
-subprojects {
-    project.evaluationDependsOn(":app")
-}
-
-// ВЫСТАВИЛИ АКТУАЛЬНУЮ ВЕРСИЮ 35 ДЛЯ ВСЕХ ПЛАГИНОВ:
-subprojects {
-    plugins.withId("com.android.application") {
-        configure<com.android.build.gradle.BaseExtension> {
-            compileSdkVersion(35)
-            defaultConfig { targetSdk = 35 }
-            if (namespace == null) {
-                namespace = "com.example.${project.name}"
-            }
-        }
-    }
-    plugins.withId("com.android.library") {
-        configure<com.android.build.gradle.BaseExtension> {
-            compileSdkVersion(35)
-            defaultConfig { targetSdk = 35 }
-            if (namespace == null) {
-                namespace = "com.example.${project.name}"
-            }
+val localProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localPropertiesFile.inputStream().use { inputStream ->
+            load(inputStream)
         }
     }
 }
 
-tasks.register<Delete>("clean") {
-    delete(rootProject.layout.buildDirectory)
+val flutterRoot = localProperties.getProperty("flutter.sdk")
+    ?: throw GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+
+val flutterVersionCode = localProperties.getProperty("flutter.versionCode")?.toIntOrNull() ?: 1
+val flutterVersionName = localProperties.getProperty("flutter.versionName") ?: "1.0"
+
+apply(plugin = "com.android.application")
+apply(plugin = "kotlin-android")
+apply(from = "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle")
+
+android {
+    compileSdk = 35
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    defaultConfig {
+        applicationId = "com.example.emergency_alert"
+        minSdk = 21
+        targetSdk = 35
+        versionCode = flutterVersionCode
+        versionName = flutterVersionName
+        multiDexEnabled = true
+    }
+
+    buildTypes {
+        release {
+            signingConfig = signingConfigs.getByName("debug")
+        }
+    }
+}
+
+flutter {
+    source = "../.."
+}
+
+dependencies {
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version")
 }
