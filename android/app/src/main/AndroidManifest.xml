@@ -17,7 +17,6 @@
         android:icon="@mipmap/ic_launcher"
         tools:replace="android:label">
 
-        <!-- Корректный сервис для Android 15, который требует новая версия плагина 0.5.4 -->
         <service
             android:name="com.example.flutter_overlay_window.services.OverlayService"
             android:exported="false"
@@ -37,8 +36,13 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" android:exported="false" />
-        <receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver" android:exported="false">
+        <receiver 
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" 
+            android:exported="false" />
+            
+        <receiver 
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver" 
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
