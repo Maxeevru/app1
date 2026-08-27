@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.emergency_alert"  // 👈 ДОЛЖЕН СОВПАДАТЬ С ПАКЕТОМ В main.dart
+    namespace = "com.example.untitled"
     compileSdk = 35
 
     compileOptions {
@@ -15,7 +15,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.emergency_alert"  // 👈 ТОЖЕ ДОЛЖНО СОВПАДАТЬ
+        applicationId = "com.example.untitled"
         minSdk = 21
         targetSdk = 35
         versionCode = 1
@@ -24,10 +24,12 @@ android {
     }
 
     buildTypes {
-        release {
-            signingConfig = signingConfigs.getByName("debug")
-        }
+    release {
+        signingConfig = signingConfigs.getByName("debug")
+        isMinifyEnabled = false
+        isShrinkResources = false
     }
+}
 }
 
 flutter {
