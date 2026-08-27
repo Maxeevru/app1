@@ -14,6 +14,7 @@
         android:label="РСЧС Оповещение"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        tools:replace="android:label">
 
         <service
     android:name="com.example.flutter_overlay_window.services.OverlayService"
