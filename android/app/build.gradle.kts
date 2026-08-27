@@ -11,6 +11,8 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+        // 👇 ЭТО ВКЛЮЧАЕТ DESUGARING
+        isCoreLibraryDesugaringEnabled = true
     }
 
     defaultConfig {
@@ -35,4 +37,6 @@ flutter {
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.0")
+    // 👇 ЭТО НУЖНО ДЛЯ DESUGARING
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 }
