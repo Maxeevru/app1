@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:telephony/telephony.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart'; // ✅ ДОБАВЛЕНО
 
 // ============================================================
 // ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
 // ============================================================
 String _lastSmsContent = "";
 final AudioPlayer _audioPlayer = AudioPlayer();
+final FlutterLocalNotificationsPlugin _notificationsPlugin = // ✅ ДОБАВЛЕНО
+    FlutterLocalNotificationsPlugin();
 
 // ============================================================
 // ГЛАВНАЯ ТОЧКА ВХОДА
@@ -119,6 +121,32 @@ class _MyAppState extends State<MyApp> {
         onBackgroundMessage: backGroundMessageHandler,
       );
 
+      // ============================================================
+      // НОВЫЙ БЛОК ДЛЯ УВЕДОМЛЕНИЙ (вставлен сюда)
+      // ============================================================
+      const AndroidInitializationSettings initSettingsAndroid =
+          AndroidInitializationSettings('@mipmap/ic_launcher');
+      const DarwinInitializationSettings initSettingsIOS =
+          DarwinInitializationSettings();
+      const InitializationSettings initSettings = InitializationSettings(
+        android: initSettingsAndroid,
+        iOS: initSettingsIOS,
+      );
+      await _notificationsPlugin.initialize(initSettings);
+
+      const AndroidNotificationChannel channel = AndroidNotificationChannel(
+        'rsms_channel',
+        'РСЧС Оповещения',
+        importance: Importance.high,
+        enableVibration: true,
+        playSound: true,
+      );
+      await _notificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(channel);
+      // ============================================================
+
       setState(() {
         _status = "✅ Утилита успешно запущена!\n\n"
             "📱 Служба РСЧС активна в фоне.\n"
@@ -226,6 +254,9 @@ class _MyAppState extends State<MyApp> {
 
     _lastSmsContent = testSms;
 
+    // 👇 ОТПРАВКА УВЕДОМЛЕНИЯ В ШТОРКУ (добавлено)
+    await _sendSystemNotification('🚨 РСЧС Оповещение', testSms);
+
     bool? isActive = await FlutterOverlayWindow.isActive();
     if (isActive != true) {
       await FlutterOverlayWindow.showOverlay(
@@ -237,6 +268,25 @@ class _MyAppState extends State<MyApp> {
         positionGravity: PositionGravity.left,
       );
     }
+  }
+
+  // ============================================================
+  // НОВАЯ ФУНКЦИЯ ДЛЯ ОТПРАВКИ СИСТЕМНЫХ УВЕДОМЛЕНИЙ (добавлена)
+  // ============================================================
+  Future<void> _sendSystemNotification(String title, String body) async {
+    const AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
+      'rsms_channel',
+      'РСЧС Оповещения',
+      importance: Importance.high,
+      priority: Priority.high,
+      enableVibration: true,
+      playSound: true,
+    );
+    const NotificationDetails details = NotificationDetails(
+      android: androidDetails,
+    );
+    await _notificationsPlugin.show(0, title, body, details);
   }
 }
 
