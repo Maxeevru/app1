@@ -1,31 +1,42 @@
 name: Build APK
+
 on:
   push:
     branches:
       - main
   workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '17'
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+
       - name: Install dependencies
         run: flutter pub get
-      - name: Force Generate Valid AndroidManifest
-        run: |
-          mkdir -p android/app/src/main
-          # Создание файла AndroidManifest.xml с необходимыми разрешениями, Activity и конфигурацией приложения для Android
-          echo '<manifest xmlns:android="http://android.com" package="com.example.untitled">' > android/app/src/main/AndroidManifest.xml
-          # (Полный код генерации разрешений и структуры манифеста через команды echo)
+
+      # ⚠️ УДАЛИТЕ ВЕСЬ ЭТОТ БЛОК, ОН ПОРТИТ МАНИФЕСТ
+      # - name: Force Generate Valid AndroidManifest
+      #   run: ...
+
       - name: Build APK
         run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: build/app/outputs/flutter-apk/app-release.apk
