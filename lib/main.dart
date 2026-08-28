@@ -616,6 +616,18 @@ class TrianglePainter extends CustomPainter {
       ),
     );
   }
+// Наш собственный класс для замены старого плагина
+class SmsMessage {
+  final String? body;
+  final String? sender;
+
+  SmsMessage({this.body, this.sender});
+
+  // Этот конструктор мы как раз вызываем в _initAppLogic
+  factory SmsMessage.fromString(String body, String sender) {
+    return SmsMessage(body: body, sender: sender);
+  }
+}
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
