@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:telephony/telephony.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -92,7 +92,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final Telephony telephony = Telephony.instance;
+  static const MethodChannel _smsChannel = MethodChannel('com.example.untitled/sms');
   String _status = "Проверка разрешений...";
   bool _isServiceRunning = false;
 
@@ -134,42 +134,36 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-  Future<void> _initAppLogic() async {
+   Future<void> _initAppLogic() async {
+    // Разрешение на уведомления
+    await _notificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.requestNotificationsPermission();
+    
     // Разрешение на оверлей
-      await _notificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.requestNotificationsPermission();
     bool? overlayAllowed = await FlutterOverlayWindow.isPermissionGranted();
     if (overlayAllowed != true) {
       await FlutterOverlayWindow.requestPermission();
     }
 
-    // Разрешение на СМС
-    bool? smsAllowed = await telephony.requestPhoneAndSmsPermissions;
+    // Слушаем СМС из Kotlin-кода
+    _smsChannel.setMethodCallHandler((MethodCall call) async {
+      if (call.method == "onSmsReceived") {
+        final Map<dynamic, dynamic> args = call.arguments as Map<dynamic, dynamic>;
+        final String sender = args["sender"] ?? "Unknown";
+        final String body = args["body"] ?? "";
+        final SmsMessage message = SmsMessage.fromString(body, sender);
+        backGroundMessageHandler(message);
+      }
+    });
 
-    if (smsAllowed == true) {
-      telephony.listenIncomingSms(
-        onNewMessage: (SmsMessage message) {
-          backGroundMessageHandler(message);
-        },
-        onBackgroundMessage: backGroundMessageHandler,
-      );
-
-      setState(() {
-        _status = "✅ Утилита успешно запущена!\n\n"
-            "📱 Служба РСЧС активна в фоне.\n"
-            "📨 При получении экстренной СМС\n"
-            "⚠️ появится оповещение поверх всех приложений.\n\n"
-            "🔄 Приложение работает даже\n"
-            "когда телефон заблокирован.";
-        _isServiceRunning = true;
-      });
-    } else {
-      setState(() {
-        _status = "❌ Ошибка!\n\n"
-            "Дайте доступ к СМС в настройках телефона:\n"
-            "Настройки → Приложения → РСЧС → Разрешения → СМС";
-        _isServiceRunning = false;
-      });
-    }
+    setState(() {
+      _status = "✅ Утилита успешно запущена!\n\n"
+          "📱 Служба РСЧС активна в фоне.\n"
+          "📨 При получении экстренной СМС\n"
+          "⚠️ появится оповещение поверх всех приложений.\n\n"
+          "🔄 Приложение работает даже\n"
+          "когда телефон заблокирован.";
+      _isServiceRunning = true;
+    });
   }
 
   @override
