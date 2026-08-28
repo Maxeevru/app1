@@ -6,7 +6,6 @@
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
@@ -17,19 +16,18 @@
         android:icon="@mipmap/ic_launcher"
         tools:replace="android:label">
 
-        <!-- 🎯 ВОТ ОНО! Настоящее внутреннее имя сервиса плагина с правильным свойством под Android 15 -->
         <service 
             android:name="flutter.overlay.window.flutter_overlay_window.OverlayService" 
-            android:exported="false" 
-            android:foregroundServiceType="specialUse"
-            tools:node="replace"> 
-            <property 
-                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" 
-                android:value="Explanation for special use of emergency alerts overlay window" /> 
-        </service>
+            android:exported="false"
+            tools:node="replace" />
 
-        <receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" android:exported="false" />
-        <receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver" android:exported="false">
+        <receiver 
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" 
+            android:exported="false" />
+            
+        <receiver 
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver" 
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
