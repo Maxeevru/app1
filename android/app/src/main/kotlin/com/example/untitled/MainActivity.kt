@@ -2,11 +2,14 @@ package com.example.untitled
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
-import com.shounakmulay.telephony.TelephonyPlugin
+import io.flutter.plugin.common.MethodChannel
 
 class MainActivity: FlutterActivity() {
+    private val CHANNEL = "com.example.untitled/sms"
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        TelephonyPlugin.registerWith(flutterEngine)
+        val channel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
+        SmsReceiver.methodChannel = channel
     }
 }
