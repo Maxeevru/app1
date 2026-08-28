@@ -6,52 +6,41 @@
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
-    <!-- 🛠️ Финальный таран: говорим Gradle принудительно объединять всё и игнорировать системные ворнинги -->
     <application
         android:label="РСЧС Оповещение"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        tools:replace="android:label"
-        tools:node="merge"
-        tools:ignore="ProtectedPermissions">
+        tools:replace="android:label">
 
-        <!-- Сервис оверлея -->
+        <!-- 🛠️ ВЫРЕЗАЕМ КОНФЛИКТНЫЙ ТИП:tools:node="remove" заставит Gradle выкинуть ошибку Android 15 -->
         <service
             android:name="com.example.flutter_overlay_window.services.OverlayService"
             android:exported="false"
             android:foregroundServiceType="specialUse"
-            tools:node="replace">
-            <property 
-                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" 
-                android:value="Emergency alerts display overlay over other apps" />
-        </service>
+            tools:node="remove" />
+
+        <!-- Оставляем чистый сервис без типов для стабильной работы -->
+        <service
+            android:name="com.example.flutter_overlay_window.services.OverlayService"
+            android:exported="false" />
 
         <!-- Служба приема СМС -->
         <receiver
             android:name="com.shounakmulay.telephony.sms.IncomingSmsReceiver"
             android:permission="android.permission.BROADCAST_SMS"
-            android:exported="true"
-            tools:node="replace">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
         </receiver>
 
         <!-- Компоненты для работы уведомлений -->
-        <receiver 
-            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" 
-            android:exported="false"
-            tools:node="replace" />
-            
-        <receiver 
-            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver" 
-            android:exported="false"
-            tools:node="replace">
+        <receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" android:exported="false" />
+        <receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
@@ -67,8 +56,7 @@
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
-            android:windowSoftInputMode="adjustResize"
-            tools:node="replace">
+            android:windowSoftInputMode="adjustResize">
 
             <meta-data
                 android:name="io.flutter.embedding.android.NormalTheme"
