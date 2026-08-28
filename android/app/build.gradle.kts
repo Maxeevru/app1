@@ -14,6 +14,10 @@ android {
         isCoreLibraryDesugaringEnabled = true
     }
 
+kotlinOptions {
+    jvmTarget = "11"
+}
+
     defaultConfig {
         applicationId = "com.example.untitled"
         minSdk = 21
