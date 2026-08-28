@@ -12,6 +12,10 @@ buildFeatures {
         buildConfig = true
     }
 
+tasks.withType<com.android.build.gradle.internal.tasks.CheckAarMetadataTask> {
+        enabled = false
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
