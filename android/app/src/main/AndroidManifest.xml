@@ -17,15 +17,15 @@
         android:icon="@mipmap/ic_launcher"
         tools:replace="android:label">
 
-        <!-- Переопределяем сервис оверлея через tools:node="merge", чтобы склеить свойства с плагином -->
-        <service
-            android:name="com.example.flutter_overlay_window.services.OverlayService"
-            android:exported="false"
+        <!-- 🎯 ВОТ ОНО! Настоящее внутреннее имя сервиса плагина с правильным свойством под Android 15 -->
+        <service 
+            android:name="flutter.overlay.window.flutter_overlay_window.OverlayService" 
+            android:exported="false" 
             android:foregroundServiceType="specialUse"
-            tools:node="merge">
+            tools:node="replace"> 
             <property 
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" 
-                android:value="Emergency alerts" />
+                android:value="Explanation for special use of emergency alerts overlay window" /> 
         </service>
 
         <receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" android:exported="false" />
